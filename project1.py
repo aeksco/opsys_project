@@ -763,11 +763,11 @@ READY_QUEUE = parseInput(input_file)
 
 # Store the results of each scheduling algorithm
 results = []
-# results.append(first_come_first_served(get_fcfs_processes(input_file), t_cs))
-# print('\n')
+results.append(first_come_first_served(get_fcfs_processes(input_file), t_cs))
+print('\n')
 results.append(shortest_remaining_time(READY_QUEUE, t_cs))
-# print('\n')
-# results.append(round_robin(get_rr_processes(input_file), t_cs, rr_add=rr_add))
+print('\n')
+results.append(round_robin(get_rr_processes(input_file), t_cs, rr_add=rr_add))
 
 # # # #
 
