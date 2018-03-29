@@ -111,7 +111,7 @@ def addElementsToQRR(Q, processes, currTime, rr_add):
                     if (value[6] > 0 or rr_add == "END"):
                         Q.append(key)
                     else:
-                        q.insert(0, key)
+                        Q.insert(0, key)
                     elementsInList = getElementsInList(Q)
                     if (value[6] == 0):
                         if(value[4] > 0):
@@ -741,10 +741,10 @@ ARGV = sys.argv
 input_file = ARGV[1]
 output_file = ARGV[2]
 
-if (len(ARGV) > 2):
+if (len(ARGV) > 3):
     rr_add = ARGV[3]
 else:
-    rr_add = False
+    rr_add = "END"
 
 # TODO - detect missing arguments, display an error message as follows on stderr:
 #   ERROR: Invalid arguments
@@ -762,7 +762,7 @@ results.append(first_come_first_served(get_fcfs_processes(input_file), t_cs))
 print('\n')
 results.append(shortest_remaining_time(READY_QUEUE, t_cs))
 print('\n')
-results.append(round_robin(get_rr_processes(input_file), t_cs))
+results.append(round_robin(get_rr_processes(input_file), t_cs, rr_add=rr_add))
 
 # # # #
 
