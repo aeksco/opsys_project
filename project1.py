@@ -349,7 +349,7 @@ def shortest_remaining_time(processes, t_cs):
     io_waits = []
 
     # Start log
-    print(timeLog(time) + 'Simulator started for SRT')
+    print(timeLog(time) + 'Simulator started for SRT' + queueLog(queue))
 
     # Loop until done
     while not done:
