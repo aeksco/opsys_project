@@ -100,6 +100,27 @@ def addElementsToQ(Q, processes, currTime):
 
     return Q
 
+def addElementsToQRR(Q, processes, currTime, rr_add):
+    #Check to see which processes aren't in the Q
+    #If not in the Q, and the process has arrived
+    #If the process still has bursts left -> append it
+    for key, value in processes.items():
+        if(key not in Q):
+            if(value[0] <= currTime):
+                if(value[2] > 0):
+                    if (value[6] > 0 or rr_add == "END"):
+                        Q.append(key)
+                    else:
+                        q.insert(0, key)
+                    elementsInList = getElementsInList(Q)
+                    if (value[6] == 0):
+                        if(value[4] > 0):
+                            print(timeLog(currTime) + "Process " + key + " completed I/O; added to ready queue " + elementsInList)
+                        else:
+                            print(timeLog(currTime) + "Process " + key + " arrived and added to ready queue " + elementsInList)
+
+    return Q
+
 def checkIfAllProcessesDone(processes):
     for key, value in processes.items():
         if(value[2] > 0):
@@ -125,6 +146,27 @@ def get_fcfs_processes(input_file):
 
   file.close()
   return processes
+
+def get_rr_processes(input_file):
+    file = open(input_file,'r')
+
+    processes = dict()
+
+    #Extract info from input file
+    for line in file:
+        if(len(line) > 0 and line[0] != '#'):
+            elements = line.split('|')
+            for i in range(1,len(elements)):
+                elements[i] = int(elements[i])
+                processes[line[0]] = elements[1:]
+                #append another line to track how many processes have been completed
+                processes[line[0]].append(0) #[4]
+                #append another line to track total wait time
+                processes[line[0]].append(0) #[5]
+                processes[line[0]].append(0) #[6] - remaining time after preemption
+
+    file.close()
+    return processes
 
 # Writes the algorithm statistics to a file
 def writeOutput(output_file, results):
@@ -297,7 +339,7 @@ def shortest_remaining_time(processes, t_cs):
 
     # Sets time, done, result, and queue variables
     result = newResult()
-    time = -1
+    time = 0
     done = False
     queue = []
     currentProcess = None
@@ -307,13 +349,10 @@ def shortest_remaining_time(processes, t_cs):
     io_waits = []
 
     # Start log
-    print(timeLog(time + 1) + 'Simulator started for SRT')
+    print(timeLog(time) + 'Simulator started for SRT')
 
     # Loop until done
     while not done:
-
-        # Increments time by 1ms
-        time = time + 1
 
         # Iterate over each process in the queue...
         for process in processes:
@@ -510,6 +549,9 @@ def shortest_remaining_time(processes, t_cs):
 
         # # # #
 
+        # Increments time by 1ms
+        time = time + 1
+
         # Handles swap delay
         if swapping:
             if swap_timer == 0:
@@ -557,6 +599,140 @@ def shortest_remaining_time(processes, t_cs):
 
 # # # # #
 
+def round_robin(processes, t_cs=8, t_slice=80, rr_add="END"):
+    elementsInList = getElementsInList([])
+    print("time 0ms: Simulator started for RR " + elementsInList)
+
+    Q = []
+    currTime = 0
+    Q = addElementsToQRR(Q, processes, currTime, rr_add)
+
+    #Continually run each process then check to see if new processes need to be added to the Q
+
+    #done is a boolean flag that tells whether all the processes in the dict have finished or not -> primarily used if there is a gap between a set of processes finishing and a new one arriving (would make the Q empty temporarily but doesn't mean that all processes have finished)
+    done = False
+
+    # <proc-id>|<initial-arrival-time>|<cpu-burst-time>|<num-bursts>|<io-time>
+    #  0         0                      1                2            3
+
+    while(not done):
+        Q = addElementsToQRR(Q, processes, currTime, rr_add)
+        while(Q):
+
+            for i in range(int(t_cs/2)):
+                currTime += 1
+                Q = addElementsToQRR(Q, processes, currTime, rr_add)
+            currProcess = Q.pop(0)
+
+            #wait time is amount of time in ready queue
+            #curr time - arrival time (time when put in ready queue)
+            waitTime = currTime - processes[currProcess][0]
+            processes[currProcess][5] += waitTime
+
+
+
+            elementsInList = getElementsInList(Q)
+
+
+            if (processes[currProcess][6] > 0):
+                print(timeLog(currTime) + "Process " + currProcess + " started using the CPU with " + str(int(processes[currProcess][6])) + "ms remaining " + elementsInList)
+                # burstTime = processes[currProcess][6]
+
+            else:
+                print(timeLog(currTime) + "Process " + currProcess + " started using the CPU " + elementsInList)
+                # burstTime = processes[currProcess][1]
+
+            nopreempt = True
+            while (nopreempt):
+                if (processes[currProcess][6] > 0):
+                    burstTime = processes[currProcess][6]
+                else:
+                    burstTime = processes[currProcess][1]
+
+                if (burstTime > t_slice):
+                    finTime = currTime + t_slice
+                    processes[currProcess][6] = burstTime - t_slice
+                    processes[currProcess][0] = finTime + t_cs/2
+                else:
+                    nopreempt = False
+                    finTime = currTime + burstTime
+                    ioTime = processes[currProcess][3]
+                    processes[currProcess][2] -= 1
+                    processes[currProcess][4] += 1
+                    processes[currProcess][0] = finTime + ioTime + t_cs/2
+                    processes[currProcess][6] = 0
+
+                while(currTime < finTime):
+                    currTime += 1
+                    Q = addElementsToQRR(Q, processes, currTime, rr_add)
+                elementsInList = getElementsInList(Q)
+
+                if (len(Q) == 0 and processes[currProcess][6] > 0):
+                    # time 1446ms: Time slice expired; no preemption because ready queue is empty [Q <empty>]
+                    print(timeLog(currTime) + "Time slice expired; no preemption because ready queue is empty " + elementsInList)
+
+                else:
+                    nopreempt = False
+                    # if (processes[currProcess][]):
+                    #     Q.append(currProcess)
+
+
+            if(processes[currProcess][2] == 0):
+                print(timeLog(currTime) + "Process " + currProcess + " terminated " + elementsInList)
+            elif(processes[currProcess][6] > 0):
+                # time 172ms: Time slice expired; process B preempted with 305ms to go [Q A]
+                print(timeLog(currTime) + "Time slice expired; process " + currProcess + " preempted with " + str(int(processes[currProcess][6])) + "ms to go " + elementsInList)
+                # Q.append(currProcess)
+            else:
+                print(timeLog(currTime) + "Process " + currProcess + " completed a CPU burst; " + str(processes[currProcess][2]) + (" burst" if (processes[currProcess][2] == 1) else " bursts") + " to go " + elementsInList)
+                print(timeLog(currTime) + "Process " + currProcess + " switching out of CPU; will block on I/O until time " + str(int(currTime + ioTime + t_cs/2)) + "ms " + elementsInList)
+
+
+
+            # currTime += t_cs/2
+            for i in range(int(t_cs/2)):
+                currTime += 1
+                Q = addElementsToQRR(Q, processes, currTime, rr_add)
+
+
+
+        done = checkIfAllProcessesDone(processes)
+
+        if(not done):
+            currTime += 1
+
+    print(timeLog(currTime) + "Simulator ended for RR")
+
+    #for FCFS # context switches = total # of processes
+    cSwitches = 0
+
+    #take the average of all the wanted info
+    avgBurst = 0
+    avgWait = 0
+
+    for burst in processes.values():
+        avgBurst += burst[1] * burst[4]
+        avgWait += burst[5]
+        cSwitches += burst[4]
+
+    avgBurst /= cSwitches
+    avgWait /= cSwitches
+
+    #turnaround time = cpu burst time + wait time + t_cs
+    avgTT = avgBurst + avgWait + t_cs
+
+    # Puts statistics into result dict
+    result = newResult()
+    result['name'] = 'FCFS'
+    result['avg_cpu_burst'] = round(avgBurst,2)
+    result['avg_wait'] = round(avgWait,2)
+    result['avg_turnaround'] = round(avgTT,2)
+    result['total_ctx_switch'] = str(cSwitches)
+    result['total_preemptions'] = 0
+    return result
+
+# # # # #
+
 # COMMAND LINE ARGUMENTS
 # python project1.py <input-file> <stats-output-file> [<rr-add>]
 
@@ -585,8 +761,8 @@ results = []
 results.append(first_come_first_served(get_fcfs_processes(input_file), t_cs))
 print('\n')
 results.append(shortest_remaining_time(READY_QUEUE, t_cs))
-# print('\n')
-# results.append(round_robin(READY_QUEUE, rr_add))
+print('\n')
+results.append(round_robin(get_rr_processes(input_file), t_cs))
 
 # # # #
 
