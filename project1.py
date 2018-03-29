@@ -535,17 +535,20 @@ def shortest_remaining_time(processes, t_cs):
                         print(timeLog(time) + 'Process ' + currentProcess['proc_id'] + ' switching out of CPU; will block on I/O until time ' + str(currentProcess['io_wait']) + 'ms' + queueLog(queue))
 
                         # Sets swapping and swap_timer
-                        swap_timer = 4
-                        swapping = True
+                        # swap_timer = 4
+                        # swapping = True
 
                     # Logs process termination
                     else:
                         print(timeLog(time) + 'Process ' + currentProcess['proc_id'] + ' terminated' + queueLog(queue))
                         currentProcess['done'] = True
 
+                    # Sets swapping and swap_timer
+                    swap_timer = 4
+                    swapping = True
                     currentBurst = None
                     currentProcess = None
-                    continue
+                    break
 
         # # # #
 
@@ -567,7 +570,9 @@ def shortest_remaining_time(processes, t_cs):
         for p in processes:
             if not p['done']:
                 allDone = False
-        done = allDone
+
+        if swap_timer == 0:
+            done = allDone
 
     # End log
     print(timeLog(time) + 'Simulator ended for SRT')
@@ -758,11 +763,11 @@ READY_QUEUE = parseInput(input_file)
 
 # Store the results of each scheduling algorithm
 results = []
-results.append(first_come_first_served(get_fcfs_processes(input_file), t_cs))
-print('\n')
+# results.append(first_come_first_served(get_fcfs_processes(input_file), t_cs))
+# print('\n')
 results.append(shortest_remaining_time(READY_QUEUE, t_cs))
-print('\n')
-results.append(round_robin(get_rr_processes(input_file), t_cs, rr_add=rr_add))
+# print('\n')
+# results.append(round_robin(get_rr_processes(input_file), t_cs, rr_add=rr_add))
 
 # # # #
 
