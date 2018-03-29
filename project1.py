@@ -288,7 +288,7 @@ def first_come_first_served(processes, t_cs):
             if(processes[currProcess][2] == 0):
                 print(timeLog(currTime) + "Process " + currProcess + " terminated " + elementsInList)
             else:
-                print(timeLog(currTime) + "Process " + currProcess + " completed a CPU burst; " + str(processes[currProcess][2]) + " bursts to go " + elementsInList)
+                print(timeLog(currTime) + "Process " + currProcess + " completed a burst; " + str(processes[currProcess][2]) + " bursts to go " + elementsInList)
                 print(timeLog(currTime) + "Process " + currProcess + " switching out of CPU; will block on I/O until time " + str(int(currTime + ioTime + t_cs/2)) + "ms " + elementsInList)
 
 
@@ -684,7 +684,7 @@ def round_robin(processes, t_cs=8, t_slice=80, rr_add="END"):
                 print(timeLog(currTime) + "Time slice expired; process " + currProcess + " preempted with " + str(int(processes[currProcess][6])) + "ms to go " + elementsInList)
                 # Q.append(currProcess)
             else:
-                print(timeLog(currTime) + "Process " + currProcess + " completed a CPU burst; " + str(processes[currProcess][2]) + (" burst" if (processes[currProcess][2] == 1) else " bursts") + " to go " + elementsInList)
+                print(timeLog(currTime) + "Process " + currProcess + " completed a burst; " + str(processes[currProcess][2]) + (" burst" if (processes[currProcess][2] == 1) else " bursts") + " to go " + elementsInList)
                 print(timeLog(currTime) + "Process " + currProcess + " switching out of CPU; will block on I/O until time " + str(int(currTime + ioTime + t_cs/2)) + "ms " + elementsInList)
 
 
