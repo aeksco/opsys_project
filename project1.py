@@ -324,7 +324,7 @@ def first_come_first_served(processes, t_cs):
 
     # Puts statistics into result dict
     result = newResult()
-    result['name'] = 'FCFS'
+    result['name'] = 'RR'
     result['avg_cpu_burst'] = round(avgBurst,2)
     result['avg_wait'] = round(avgWait,2)
     result['avg_turnaround'] = round(avgTT,2)
