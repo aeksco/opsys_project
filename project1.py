@@ -164,6 +164,7 @@ def get_rr_processes(input_file):
                 #append another line to track total wait time
                 processes[line[0]].append(0) #[5]
                 processes[line[0]].append(0) #[6] - remaining time after preemption
+                processes[line[0]].append(0) #[7] - turnaround time
 
     file.close()
     return processes
@@ -612,6 +613,8 @@ def round_robin(processes, t_cs=8, t_slice=80, rr_add="END"):
     currTime = 0
     Q = addElementsToQRR(Q, processes, currTime, rr_add)
 
+    total_preemptions = 0
+
     #Continually run each process then check to see if new processes need to be added to the Q
 
     #done is a boolean flag that tells whether all the processes in the dict have finished or not -> primarily used if there is a gap between a set of processes finishing and a new one arriving (would make the Q empty temporarily but doesn't mean that all processes have finished)
@@ -624,6 +627,7 @@ def round_robin(processes, t_cs=8, t_slice=80, rr_add="END"):
         Q = addElementsToQRR(Q, processes, currTime, rr_add)
         while(Q):
 
+            startTime = currTime
             for i in range(int(t_cs/2)):
                 currTime += 1
                 Q = addElementsToQRR(Q, processes, currTime, rr_add)
@@ -631,7 +635,7 @@ def round_robin(processes, t_cs=8, t_slice=80, rr_add="END"):
 
             #wait time is amount of time in ready queue
             #curr time - arrival time (time when put in ready queue)
-            waitTime = currTime - processes[currProcess][0]
+            waitTime = startTime - processes[currProcess][0]
             processes[currProcess][5] += waitTime
 
 
@@ -687,6 +691,7 @@ def round_robin(processes, t_cs=8, t_slice=80, rr_add="END"):
             elif(processes[currProcess][6] > 0):
                 # time 172ms: Time slice expired; process B preempted with 305ms to go [Q A]
                 print(timeLog(currTime) + "Time slice expired; process " + currProcess + " preempted with " + str(int(processes[currProcess][6])) + "ms to go " + elementsInList)
+                total_preemptions += 1
                 # Q.append(currProcess)
             else:
                 print(timeLog(currTime) + "Process " + currProcess + " completed a CPU burst; " + str(processes[currProcess][2]) + (" burst" if (processes[currProcess][2] == 1) else " bursts") + " to go " + elementsInList)
@@ -709,22 +714,22 @@ def round_robin(processes, t_cs=8, t_slice=80, rr_add="END"):
     print(timeLog(currTime) + "Simulator ended for RR")
 
     #for FCFS # context switches = total # of processes
-    cSwitches = 0
+    cSwitches = 0.0
 
     #take the average of all the wanted info
-    avgBurst = 0
-    avgWait = 0
+    avgBurst = 0.0
+    avgWait = 0.0
 
     for burst in processes.values():
-        avgBurst += burst[1] * burst[4]
-        avgWait += burst[5]
-        cSwitches += burst[4]
+        avgBurst += float(burst[1] * burst[4])
+        avgWait += float(burst[5])
+        cSwitches += float(burst[4])
 
     avgBurst /= cSwitches
     avgWait /= cSwitches
 
     #turnaround time = cpu burst time + wait time + t_cs
-    avgTT = avgBurst + avgWait + t_cs
+    avgTT = avgBurst + avgWait + float(t_cs) + ((float(t_cs) * total_preemptions) / len(processes.values()))
 
     # Puts statistics into result dict
     result = newResult()
@@ -732,8 +737,8 @@ def round_robin(processes, t_cs=8, t_slice=80, rr_add="END"):
     result['avg_cpu_burst'] = round(avgBurst,2)
     result['avg_wait'] = round(avgWait,2)
     result['avg_turnaround'] = round(avgTT,2)
-    result['total_ctx_switch'] = str(cSwitches)
-    result['total_preemptions'] = 0
+    result['total_ctx_switch'] = str(cSwitches + total_preemptions)
+    result['total_preemptions'] = str(int(total_preemptions))
     return result
 
 # # # # #
