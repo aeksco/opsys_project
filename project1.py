@@ -177,11 +177,11 @@ def writeOutput(output_file, results):
     with open(output_file, 'w') as f:
         for each in results:
             f.write('Algorithm ' + each['name'] + '\n')
-            f.write('-- average CPU burst time: ' + str(each['avg_cpu_burst']) + ' ms' + '\n')
-            f.write('-- average wait time: ' + str(each['avg_wait']) + ' ms' + '\n')
-            f.write('-- average turnaround time: ' + str(each['avg_turnaround']) + ' ms' + '\n')
-            f.write('-- total number of context switches: ' + str(each['total_ctx_switch']) + '\n')
-            f.write('-- total number of preemptions: ' + str(each['total_preemptions']) + '\n')
+            f.write('-- average CPU burst time: ' + str(format(each['avg_cpu_burst'], '.2f')) + ' ms' + '\n')
+            f.write('-- average wait time: ' + str(format(each['avg_wait'], '.2f')) + ' ms' + '\n')
+            f.write('-- average turnaround time: ' + str(format(each['avg_turnaround'], '.2f')) + ' ms' + '\n')
+            f.write('-- total number of context switches: ' + str(int(each['total_ctx_switch'])) + '\n')
+            f.write('-- total number of preemptions: ' + str(int(each['total_preemptions'])) + '\n')
 
     f.closed
 
@@ -337,9 +337,9 @@ def first_come_first_served(processes, t_cs):
     # Puts statistics into result dict
     result = newResult()
     result['name'] = 'FCFS'
-    result['avg_cpu_burst'] = round(avgBurst,1)
-    result['avg_wait'] = round(avgWait,1)
-    result['avg_turnaround'] = round(avgTT,1)
+    result['avg_cpu_burst'] = round(avgBurst,2)
+    result['avg_wait'] = round(avgWait,2)
+    result['avg_turnaround'] = round(avgTT,2)
     result['total_ctx_switch'] = str(cSwitches)
     result['total_preemptions'] = 0
     return result
@@ -598,7 +598,7 @@ def shortest_remaining_time(processes, t_cs):
         waitTotal = waitTotal + p['io_time']
 
     # Calculates averages
-    avg_burst = round((burstTotal / burstCount), 1)
+    avg_burst = round((burstTotal / burstCount), 2)
     total_ctx_switch = int(burstCount + result['total_preemptions'])
     avg_wait = waitTotal / total_ctx_switch
 
@@ -607,7 +607,7 @@ def shortest_remaining_time(processes, t_cs):
     result['avg_cpu_burst'] = avg_burst
     result['total_ctx_switch'] = total_ctx_switch
     result['avg_wait'] = avg_wait
-    result['avg_turnaround'] = round(avg_burst + ((t_cs * total_ctx_switch)), 1)
+    result['avg_turnaround'] = round(avg_burst + ((t_cs * total_ctx_switch)), 2)
     return result
 
 # # # # #
@@ -741,11 +741,11 @@ def round_robin(processes, t_cs=8, t_slice=80, rr_add="END"):
     # Puts statistics into result dict
     result = newResult()
     result['name'] = 'RR'
-    result['avg_cpu_burst'] = round(avgBurst,1)
-    result['avg_wait'] = round(avgWait,1)
-    result['avg_turnaround'] = round(avgTT,1)
-    result['total_ctx_switch'] = str((cSwitches + total_preemptions))
-    result['total_preemptions'] = str(int(total_preemptions))
+    result['avg_cpu_burst'] = round(avgBurst,2)
+    result['avg_wait'] = round(avgWait,2)
+    result['avg_turnaround'] = round(avgTT,2)
+    result['total_ctx_switch'] = cSwitches + total_preemptions
+    result['total_preemptions'] = int(total_preemptions)
     return result
 
 # # # # #
