@@ -637,8 +637,8 @@ def round_robin(processes, t_cs=8, t_slice=80, rr_add="END"):
             startTime = currTime
             currProcess = Q.pop(0)
             for i in range(int(t_cs/2)):
-                currTime += 1
                 Q = addElementsToQRR(Q, processes, currTime, rr_add, currProcess)
+                currTime += 1
 
 
             #wait time is amount of time in ready queue
@@ -680,8 +680,9 @@ def round_robin(processes, t_cs=8, t_slice=80, rr_add="END"):
                     processes[currProcess][6] = 0
 
                 while(currTime < finTime):
-                    currTime += 1
                     Q = addElementsToQRR(Q, processes, currTime, rr_add)
+                    currTime += 1
+
                 elementsInList = getElementsInList(Q)
 
                 if (len(Q) == 0 and processes[currProcess][6] > 0):
@@ -709,8 +710,8 @@ def round_robin(processes, t_cs=8, t_slice=80, rr_add="END"):
 
             # currTime += t_cs/2
             for i in range(int(t_cs/2)):
-                currTime += 1
                 Q = addElementsToQRR(Q, processes, currTime, rr_add)
+                currTime += 1
 
 
 
@@ -738,6 +739,7 @@ def round_robin(processes, t_cs=8, t_slice=80, rr_add="END"):
 
     #turnaround time = cpu burst time + wait time + t_cs
     avgTT = avgBurst + avgWait + float(t_cs) + ((float(t_cs) * total_preemptions) / float(len(processes.values())))
+    # avgTT = avgBurst + avgWait + t_cs
 
     # Puts statistics into result dict
     result = newResult()
