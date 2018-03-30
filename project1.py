@@ -89,7 +89,6 @@ def addElementsToQ(Q, processes, currTime):
     #If the process still has bursts left -> append it
     items = processes.items()
     items = sorted(items, key=lambda tup: tup[1])
-    # for key, value in processes.items():
     for key, value in items:
         if(key not in Q):
             if(value[0] <= currTime):
@@ -107,7 +106,10 @@ def addElementsToQRR(Q, processes, currTime, rr_add):
     #Check to see which processes aren't in the Q
     #If not in the Q, and the process has arrived
     #If the process still has bursts left -> append it
-    for key, value in processes.items():
+    # for key, value in processes.items():
+    items = processes.items()
+    items = sorted(items, key=lambda tup: tup[1])
+    for key, value in items:
         if(key not in Q):
             if(value[0] <= currTime):
                 if(value[2] > 0):
@@ -300,7 +302,7 @@ def first_come_first_served(processes, t_cs):
             if(processes[currProcess][2] == 0):
                 print("time " + str(int(currTime)) + "ms: Process " + currProcess + " terminated " + elementsInList)
             else:
-                print("time " + str(int(currTime)) + "ms: Process " + currProcess + " completed a CPU burst; " + str(processes[currProcess][2]) + " bursts to go " + elementsInList)
+                print("time " + str(int(currTime)) + "ms: Process " + currProcess + " completed a CPU burst; " + str(processes[currProcess][2]) + (" burst" if (processes[currProcess][2] == 1) else " bursts") + " to go " + elementsInList)
                 print("time " + str(int(currTime)) + "ms: Process " + currProcess + " switching out of CPU; will block on I/O until time " + str(int(currTime + ioTime + t_cs/2)) + "ms " + elementsInList)
 
             finTime = currTime + t_cs / 2
