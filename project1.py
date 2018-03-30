@@ -104,7 +104,8 @@ def addElementsToQRR(Q, processes, currTime, rr_add):
     #Check to see which processes aren't in the Q
     #If not in the Q, and the process has arrived
     #If the process still has bursts left -> append it
-    for key, value in processes.items():
+    for key in sorted(processes):
+        value = processes[key]
         if(key not in Q):
             if(value[0] <= currTime):
                 if(value[2] > 0):
@@ -738,7 +739,7 @@ def round_robin(processes, t_cs=8, t_slice=80, rr_add="END"):
     avgWait /= cSwitches
 
     #turnaround time = cpu burst time + wait time + t_cs
-    avgTT = avgBurst + avgWait + float(t_cs) + ((float(t_cs) * total_preemptions) / len(processes.values()))
+    avgTT = avgBurst + avgWait + float(t_cs) + ((float(t_cs) * total_preemptions) / float(len(processes.values())))
 
     # Puts statistics into result dict
     result = newResult()
@@ -746,7 +747,7 @@ def round_robin(processes, t_cs=8, t_slice=80, rr_add="END"):
     result['avg_cpu_burst'] = round(avgBurst,2)
     result['avg_wait'] = round(avgWait,2)
     result['avg_turnaround'] = round(avgTT,2)
-    result['total_ctx_switch'] = str(cSwitches + total_preemptions)
+    result['total_ctx_switch'] = str((cSwitches + total_preemptions))
     result['total_preemptions'] = str(int(total_preemptions))
     return result
 
