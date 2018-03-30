@@ -282,8 +282,8 @@ def first_come_first_served(processes, t_cs):
 
             finTime = currTime + t_cs / 2
             while(currTime < finTime):
-                currTime += 1
                 Q = addElementsToQ(Q, processes, currTime)
+                currTime += 1
 
 
 
@@ -295,8 +295,8 @@ def first_come_first_served(processes, t_cs):
 
             finTime = currTime + burstTime
             while(currTime < finTime):
-                currTime += 1
                 Q = addElementsToQ(Q, processes, currTime)
+                currTime += 1
             elementsInList = getElementsInList(Q)
 
             if(processes[currProcess][2] == 0):
@@ -307,9 +307,8 @@ def first_come_first_served(processes, t_cs):
 
             finTime = currTime + t_cs / 2
             while(currTime < finTime):
-                currTime += 1
                 Q = addElementsToQ(Q, processes, currTime)
-
+                currTime += 1
 
         done = checkIfAllProcessesDone(processes)
 
@@ -432,7 +431,6 @@ def shortest_remaining_time(processes, t_cs):
                 continue
 
             else:
-
                 # Handle I/O completion
                 if process['io_wait'] == time:
 
@@ -548,10 +546,6 @@ def shortest_remaining_time(processes, t_cs):
                         print(timeLog(time) + 'Process ' + currentProcess['proc_id'] + ' completed a CPU burst; ' + str(currentProcess['burst_remaining']) + ' ' + burstPlural + ' to go' + queueLog(queue))
                         print(timeLog(time) + 'Process ' + currentProcess['proc_id'] + ' switching out of CPU; will block on I/O until time ' + str(currentProcess['io_wait']) + 'ms' + queueLog(queue))
 
-                        # Sets swapping and swap_timer
-                        # swap_timer = 4
-                        # swapping = True
-
                     # Logs process termination
                     else:
                         print(timeLog(time) + 'Process ' + currentProcess['proc_id'] + ' terminated' + queueLog(queue))
@@ -562,7 +556,8 @@ def shortest_remaining_time(processes, t_cs):
                     swapping = True
                     currentBurst = None
                     currentProcess = None
-                    break
+                    # break
+                    continue
 
         # # # #
 
