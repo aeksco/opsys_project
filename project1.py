@@ -168,6 +168,7 @@ def get_rr_processes(input_file):
                 processes[line[0]].append(0) #[5]
                 processes[line[0]].append(0) #[6] - remaining time after preemption
                 processes[line[0]].append(0) #[7] - turnaround time
+                processes[line[0]].append([])
 
     file.close()
     return processes
@@ -636,6 +637,7 @@ def round_robin(processes, t_cs=8, t_slice=80, rr_add="END"):
 
             startTime = currTime
             currProcess = Q.pop(0)
+            processes[currProcess][7] = currTime
             for i in range(int(t_cs/2)):
                 Q = addElementsToQRR(Q, processes, currTime, rr_add, currProcess)
                 currTime += 1
@@ -697,6 +699,8 @@ def round_robin(processes, t_cs=8, t_slice=80, rr_add="END"):
 
             if(processes[currProcess][2] == 0):
                 print(timeLog(currTime) + "Process " + currProcess + " terminated " + elementsInList)
+                # turnaround = currTime - processes[currProcess][7]
+                # processes[currProcess][8].append(turnaround)
             elif(processes[currProcess][6] > 0):
                 # time 172ms: Time slice expired; process B preempted with 305ms to go [Q A]
                 print(timeLog(currTime) + "Time slice expired; process " + currProcess + " preempted with " + str(int(processes[currProcess][6])) + "ms to go " + elementsInList)
@@ -705,6 +709,8 @@ def round_robin(processes, t_cs=8, t_slice=80, rr_add="END"):
             else:
                 print(timeLog(currTime) + "Process " + currProcess + " completed a CPU burst; " + str(processes[currProcess][2]) + (" burst" if (processes[currProcess][2] == 1) else " bursts") + " to go " + elementsInList)
                 print(timeLog(currTime) + "Process " + currProcess + " switching out of CPU; will block on I/O until time " + str(int(currTime + ioTime + t_cs/2)) + "ms " + elementsInList)
+                # turnaround = currTime - processes[currProcess][7]
+                # processes[currProcess][8].append(turnaround)
 
 
 
@@ -713,6 +719,8 @@ def round_robin(processes, t_cs=8, t_slice=80, rr_add="END"):
                 Q = addElementsToQRR(Q, processes, currTime, rr_add)
                 currTime += 1
 
+            turnaround = currTime - processes[currProcess][7]
+            processes[currProcess][8].append(turnaround)
 
 
         done = checkIfAllProcessesDone(processes)
@@ -728,17 +736,23 @@ def round_robin(processes, t_cs=8, t_slice=80, rr_add="END"):
     #take the average of all the wanted info
     avgBurst = 0.0
     avgWait = 0.0
+    avgTT = 0.0
 
     for burst in processes.values():
         avgBurst += float(burst[1] * burst[4])
         avgWait += float(burst[5])
         cSwitches += float(burst[4])
+        # print burst[8] 
+        # avgTT += float(sum(burst[8])) / float(len(burst[8]))
 
     avgBurst /= cSwitches
     avgWait /= cSwitches
+    # avgTT /= float(len(processes))
 
     #turnaround time = cpu burst time + wait time + t_cs
-    avgTT = avgBurst + avgWait + float(t_cs) + ((float(t_cs) * total_preemptions) / float(len(processes.values())))
+    avgTT = avgBurst + avgWait + (((float(t_cs/2)) * (total_preemptions-len(processes))) / float(len(processes.values())))
+    # avgTT = (((float(t_cs)) * total_preemptions) / float(len(processes.values())))
+    # avgTT = 
     # avgTT = avgBurst + avgWait + t_cs
 
     # Puts statistics into result dict
