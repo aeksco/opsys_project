@@ -263,22 +263,31 @@ def first_come_first_served(processes, t_cs):
         Q = addElementsToQ(Q, processes, currTime)
         while(Q):
             currProcess = Q.pop(0)
+            # <proc-id>|<initial-arrival-time>|<cpu-burst-time>|<num-bursts>|<io-time>
 
             #wait time is amount of time in ready queue
             #curr time - arrival time (time when put in ready queue)
             waitTime = currTime - processes[currProcess][0]
             processes[currProcess][5] += waitTime
 
-            currTime += t_cs / 2
-            elementsInList = getElementsInList(Q)
-            print(timeLog(currTime) + "Process " + currProcess + " started using the CPU " + elementsInList)
-
-
             burstTime = processes[currProcess][1]
             ioTime = processes[currProcess][3]
-            processes[currProcess][0] = currTime + burstTime + ioTime + t_cs/2
+            processes[currProcess][0] = currTime + burstTime + ioTime + t_cs
             processes[currProcess][2] -= 1
             processes[currProcess][4] += 1
+
+            finTime = currTime + t_cs / 2
+            while(currTime < finTime):
+                currTime += 1
+                Q = addElementsToQ(Q, processes, currTime)
+
+
+
+            elementsInList = getElementsInList(Q)
+            print("time " + str(int(currTime)) + "ms: Process " + currProcess + " started using the CPU " + elementsInList)
+
+
+
 
             finTime = currTime + burstTime
             while(currTime < finTime):
@@ -287,15 +296,15 @@ def first_come_first_served(processes, t_cs):
             elementsInList = getElementsInList(Q)
 
             if(processes[currProcess][2] == 0):
-                print(timeLog(currTime) + "Process " + currProcess + " terminated " + elementsInList)
+                print("time " + str(int(currTime)) + "ms: Process " + currProcess + " terminated " + elementsInList)
             else:
-                print(timeLog(currTime) + "Process " + currProcess + " completed a CPU burst; " + str(processes[currProcess][2]) + (" burst" if (processes[currProcess][2] == 1) else " bursts") + " to go " + elementsInList)
-                print(timeLog(currTime) + "Process " + currProcess + " switching out of CPU; will block on I/O until time " + str(int(currTime + ioTime + t_cs/2)) + "ms " + elementsInList)
+                print("time " + str(int(currTime)) + "ms: Process " + currProcess + " completed a CPU burst; " + str(processes[currProcess][2]) + " bursts to go " + elementsInList)
+                print("time " + str(int(currTime)) + "ms: Process " + currProcess + " switching out of CPU; will block on I/O until time " + str(int(currTime + ioTime + t_cs/2)) + "ms " + elementsInList)
 
-
-
-            currTime += t_cs/2
-
+            finTime = currTime + t_cs / 2
+            while(currTime < finTime):
+                currTime += 1
+                Q = addElementsToQ(Q, processes, currTime)
 
 
         done = checkIfAllProcessesDone(processes)
@@ -303,7 +312,7 @@ def first_come_first_served(processes, t_cs):
         if(not done):
             currTime += 1
 
-    print(timeLog(currTime) + "Simulator ended for FCFS")
+    print("time " + str(int(currTime)) + "ms: Simulator ended for FCFS")
 
     #for FCFS # context switches = total # of processes
     cSwitches = 0
