@@ -340,7 +340,7 @@ def first_come_first_served(processes, t_cs):
     result['avg_cpu_burst'] = round(avgBurst,2)
     result['avg_wait'] = round(avgWait,2)
     result['avg_turnaround'] = round(avgTT,2)
-    result['total_ctx_switch'] = str(cSwitches)
+    result['total_ctx_switch'] = cSwitches
     result['total_preemptions'] = 0
     return result
 
@@ -639,7 +639,7 @@ def round_robin(processes, t_cs=8, t_slice=80, rr_add="END"):
             for i in range(int(t_cs/2)):
                 currTime += 1
                 Q = addElementsToQRR(Q, processes, currTime, rr_add, currProcess)
-            
+
 
             #wait time is amount of time in ready queue
             #curr time - arrival time (time when put in ready queue)
