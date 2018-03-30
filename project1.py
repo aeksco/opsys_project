@@ -281,8 +281,8 @@ def first_come_first_served(processes, t_cs):
 
             finTime = currTime + t_cs / 2
             while(currTime < finTime):
-                currTime += 1
                 Q = addElementsToQ(Q, processes, currTime)
+                currTime += 1
 
 
 
@@ -294,8 +294,8 @@ def first_come_first_served(processes, t_cs):
 
             finTime = currTime + burstTime
             while(currTime < finTime):
-                currTime += 1
                 Q = addElementsToQ(Q, processes, currTime)
+                currTime += 1
             elementsInList = getElementsInList(Q)
 
             if(processes[currProcess][2] == 0):
@@ -306,9 +306,8 @@ def first_come_first_served(processes, t_cs):
 
             finTime = currTime + t_cs / 2
             while(currTime < finTime):
-                currTime += 1
                 Q = addElementsToQ(Q, processes, currTime)
-
+                currTime += 1
 
         done = checkIfAllProcessesDone(processes)
 
@@ -338,9 +337,9 @@ def first_come_first_served(processes, t_cs):
     # Puts statistics into result dict
     result = newResult()
     result['name'] = 'FCFS'
-    result['avg_cpu_burst'] = round(avgBurst,2)
-    result['avg_wait'] = round(avgWait,2)
-    result['avg_turnaround'] = round(avgTT,2)
+    result['avg_cpu_burst'] = round(avgBurst,1)
+    result['avg_wait'] = round(avgWait,1)
+    result['avg_turnaround'] = round(avgTT,1)
     result['total_ctx_switch'] = str(cSwitches)
     result['total_preemptions'] = 0
     return result
@@ -431,7 +430,6 @@ def shortest_remaining_time(processes, t_cs):
                 continue
 
             else:
-
                 # Handle I/O completion
                 if process['io_wait'] == time:
 
@@ -547,10 +545,6 @@ def shortest_remaining_time(processes, t_cs):
                         print(timeLog(time) + 'Process ' + currentProcess['proc_id'] + ' completed a CPU burst; ' + str(currentProcess['burst_remaining']) + ' ' + burstPlural + ' to go' + queueLog(queue))
                         print(timeLog(time) + 'Process ' + currentProcess['proc_id'] + ' switching out of CPU; will block on I/O until time ' + str(currentProcess['io_wait']) + 'ms' + queueLog(queue))
 
-                        # Sets swapping and swap_timer
-                        # swap_timer = 4
-                        # swapping = True
-
                     # Logs process termination
                     else:
                         print(timeLog(time) + 'Process ' + currentProcess['proc_id'] + ' terminated' + queueLog(queue))
@@ -561,7 +555,8 @@ def shortest_remaining_time(processes, t_cs):
                     swapping = True
                     currentBurst = None
                     currentProcess = None
-                    break
+                    # break
+                    continue
 
         # # # #
 
@@ -603,7 +598,7 @@ def shortest_remaining_time(processes, t_cs):
         waitTotal = waitTotal + p['io_time']
 
     # Calculates averages
-    avg_burst = round((burstTotal / burstCount), 2)
+    avg_burst = round((burstTotal / burstCount), 1)
     total_ctx_switch = int(burstCount + result['total_preemptions'])
     avg_wait = waitTotal / total_ctx_switch
 
@@ -612,7 +607,7 @@ def shortest_remaining_time(processes, t_cs):
     result['avg_cpu_burst'] = avg_burst
     result['total_ctx_switch'] = total_ctx_switch
     result['avg_wait'] = avg_wait
-    result['avg_turnaround'] = round(avg_burst + ((t_cs * total_ctx_switch)), 2)
+    result['avg_turnaround'] = round(avg_burst + ((t_cs * total_ctx_switch)), 1)
     return result
 
 # # # # #
@@ -747,9 +742,9 @@ def round_robin(processes, t_cs=8, t_slice=80, rr_add="END"):
     # Puts statistics into result dict
     result = newResult()
     result['name'] = 'RR'
-    result['avg_cpu_burst'] = round(avgBurst,2)
-    result['avg_wait'] = round(avgWait,2)
-    result['avg_turnaround'] = round(avgTT,2)
+    result['avg_cpu_burst'] = round(avgBurst,1)
+    result['avg_wait'] = round(avgWait,1)
+    result['avg_turnaround'] = round(avgTT,1)
     result['total_ctx_switch'] = str((cSwitches + total_preemptions))
     result['total_preemptions'] = str(int(total_preemptions))
     return result
