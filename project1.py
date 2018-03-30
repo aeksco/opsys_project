@@ -102,13 +102,13 @@ def addElementsToQ(Q, processes, currTime):
 
     return Q
 
-def addElementsToQRR(Q, processes, currTime, rr_add):
+def addElementsToQRR(Q, processes, currTime, rr_add, currProcess=None):
     #Check to see which processes aren't in the Q
     #If not in the Q, and the process has arrived
     #If the process still has bursts left -> append it
     for key in sorted(processes):
         value = processes[key]
-        if(key not in Q):
+        if(key not in Q and key != currProcess):
             if(value[0] <= currTime):
                 if(value[2] > 0):
                     if (value[6] > 0 or rr_add == "END"):
@@ -635,10 +635,11 @@ def round_robin(processes, t_cs=8, t_slice=80, rr_add="END"):
         while(Q):
 
             startTime = currTime
+            currProcess = Q.pop(0)
             for i in range(int(t_cs/2)):
                 currTime += 1
-                Q = addElementsToQRR(Q, processes, currTime, rr_add)
-            currProcess = Q.pop(0)
+                Q = addElementsToQRR(Q, processes, currTime, rr_add, currProcess)
+            
 
             #wait time is amount of time in ready queue
             #curr time - arrival time (time when put in ready queue)
