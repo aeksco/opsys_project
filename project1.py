@@ -87,7 +87,10 @@ def addElementsToQ(Q, processes, currTime):
     #Check to see which processes aren't in the Q
     #If not in the Q, and the process has arrived
     #If the process still has bursts left -> append it
-    for key, value in processes.items():
+    items = processes.items()
+    items = sorted(items, key=lambda tup: tup[1])
+    # for key, value in processes.items():
+    for key, value in items:
         if(key not in Q):
             if(value[0] <= currTime):
                 if(value[2] > 0):
@@ -610,7 +613,7 @@ def shortest_remaining_time(processes, t_cs):
     result['avg_cpu_burst'] = avg_burst
     result['total_ctx_switch'] = total_ctx_switch
     result['avg_wait'] = avg_wait
-    result['avg_turnaround'] = avg_burst + avg_wait + t_cs
+    result['avg_turnaround'] = round(avg_burst + ((t_cs * total_ctx_switch)), 2)
     return result
 
 # # # # #
